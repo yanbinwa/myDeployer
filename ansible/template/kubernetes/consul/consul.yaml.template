@@ -1,0 +1,77 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: consul
+spec:
+  serviceName: "consul"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: consul-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - consul-{{ PROJECT_NAME }}
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: consul
+        image: {{ CONSUL_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ CONSUL_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /consul/config
+          name: consulconfig
+        - mountPath: /consul/data
+          name: consuldata
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime 
+       - name: consulconfig
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/consul/config
+       - name: consuldata
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/consul/data
+
+      nodeSelector:
+        kubernetes.io/hostname: {{ K8S_HOST_IP }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ CONSUL_SERVICENAME }}
+  labels:
+    app: consul-{{ PROJECT_NAME }}
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ CONSUL_PORT }}
+    targetPort: {{ CONSUL_TARGETPORT }}
+    nodePort: {{ CONSUL_NODEPORT }}
+  selector:
+    app: consul-{{ PROJECT_NAME }}

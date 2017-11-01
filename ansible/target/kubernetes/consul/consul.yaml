@@ -1,0 +1,75 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: consul
+spec:
+  serviceName: "consul"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: consul-emotibotsoundbox
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - consul-emotibotsoundbox
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: consul
+        image: 172.16.101.70/hrbot/consul:0.8.4
+        envFrom:
+        - configMapRef:
+            name: emotibotsoundbox
+        ports:
+          - containerPort: 8500
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /consul/config
+          name: consulconfig
+        - mountPath: /consul/data
+          name: consuldata
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime 
+       - name: consulconfig
+         hostPath:
+           path: /servicedata/emotibotsoundbox/consul/config
+       - name: consuldata
+         hostPath:
+           path: /servicedata/emotibotsoundbox/consul/data
+
+      nodeSelector:
+        kubernetes.io/hostname: 172.16.101.91
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul
+  labels:
+    app: consul-emotibotsoundbox
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8500
+    targetPort: 8500
+    nodePort: 31001
+  selector:
+    app: consul-emotibotsoundbox

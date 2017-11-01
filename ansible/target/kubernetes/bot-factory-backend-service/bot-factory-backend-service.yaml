@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bot-factory-backend-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bot-factory-backend-service-emotibotsoundbox
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - bot-factory-backend-service-emotibotsoundbox
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: bot-factory-backend-service
+        image: 172.16.101.70/hrbot/bot-factory-backend-service:4351bad
+        envFrom:
+        - configMapRef:
+            name: emotibotsoundbox
+        ports:
+          - containerPort: 15501
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime
+           
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot-factory-backend-service
+  labels:
+    app: bot-factory-backend-service-emotibotsoundbox
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 15501
+    targetPort: 15501
+  selector:
+    app: bot-factory-backend-service-emotibotsoundbox

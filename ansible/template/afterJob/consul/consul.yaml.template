@@ -1,0 +1,17 @@
+---
+- hosts: {{ HOST }}
+  user: {{ USER }}
+  sudo: yes
+  tasks:
+
+  - name: create mapping_table for consul
+    shell: curl -XPUT 'http://{{ K8S_HOST_IP }}:{{ CONSUL_NODEPORT }}/v1/kv/dev/te/mapping_table' -d ''
+    
+  - name: create mapping_table_all for consul
+    shell: curl -XPUT 'http://{{ K8S_HOST_IP }}:{{ CONSUL_NODEPORT }}/v1/kv/dev/te/mapping_table_all' -d ''
+    
+  - name: create scenario for consul
+    shell: curl -XPUT 'http://{{ K8S_HOST_IP }}:{{ CONSUL_NODEPORT }}/v1/kv/dev/te/scenario' -d ''
+    
+  - name: create scenario_all for consul
+    shell: curl -XPUT 'http://{{ K8S_HOST_IP }}:{{ CONSUL_NODEPORT }}/v1/kv/dev/te/scenario_all' -d ''

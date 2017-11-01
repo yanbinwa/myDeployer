@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  user: deployer
+  sudo: yes
+  tasks:
+
+  - name: replace word_bank_check.php file
+    shell: kubectl cp ../package/houta/word_bank_check.php houta-0:/var/www/html/api/ApiKey/word_bank_check.php
+    
+  - name: replace intent_check.php file
+    shell: kubectl cp ../package/houta/intent_check.php houta-0:/var/www/html/api/ApiKey/intent_check.php
+    
+  - name: replace mapping_table_upload.php file
+    shell: kubectl cp ../package/houta/mapping_table_upload.php houta-0:/var/www/html/api/ApiKey/mapping_table_upload.php

@@ -1,0 +1,81 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: houta
+spec:
+  serviceName: "houta"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: houta-emotibotsoundbox
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - houta-emotibotsoundbox
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: houta
+        image: 172.16.101.70/hrbot/houta:c9908dd_task-engine
+        envFrom:
+        - configMapRef:
+            name: emotibotsoundbox
+        ports:
+          - containerPort: 80
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /home/deployer/debug_logs/logs
+          name: houtadebug
+        - mountPath: /home/deployer/backend_logs
+          name: houtafile
+        - mountPath: /var/www/html/Files
+          name: houtadata
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime 
+       - name: houtadebug
+         hostPath:
+           path: /servicedata/emotibotsoundbox/houta/debug_logs/logs
+       - name: houtafile
+         hostPath:
+           path: /servicedata/emotibotsoundbox/houta/backend_logs
+       - name: houtadata
+         hostPath:
+           path: /servicedata/emotibotsoundbox/houta/Files
+
+      nodeSelector:
+        kubernetes.io/hostname: 172.16.101.91
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: houta
+  labels:
+    app: houta-emotibotsoundbox
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 31017
+  selector:
+    app: houta-emotibotsoundbox
+

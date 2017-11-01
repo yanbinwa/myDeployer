@@ -1,0 +1,7 @@
+---
+- include: ../target/initJob/initJob.yaml
+- include: ../target/preJob/consul/consul.yaml
+- include: ../target/preJob/houta/houta.yaml
+- include: ../target/mainJob/mainJob.yaml
+- include: ../target/afterJob/consul/consul.yaml
+- include: ../target/afterJob/houta/houta.yaml

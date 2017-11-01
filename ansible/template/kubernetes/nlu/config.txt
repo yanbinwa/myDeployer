@@ -1,0 +1,4 @@
+WEB_PORT: "13901"
+NUM_THREAD: "8"
+CONSUL_SERVICE_URL: "http://consul:8500/"
+CONSUL_SERVICE_PREFIX: "dev/cnlu"

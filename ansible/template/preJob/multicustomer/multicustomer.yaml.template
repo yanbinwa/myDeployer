@@ -1,0 +1,14 @@
+---
+- hosts: {{ K8S_HOST }}
+  user: {{ K8S_USER }}
+  sudo: yes
+  tasks:
+
+  - name: create multicustomer dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ MULTICUSTOMER_SERVICENAME }}  state=directory  mode=0777
+
+  - name: create multicustomer logs dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ MULTICUSTOMER_SERVICENAME }}/logs  state=directory  mode=0777
+    
+  - name: create multicustomer nlp dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ MULTICUSTOMER_SERVICENAME }}/nlp  state=directory  mode=0777

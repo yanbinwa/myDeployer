@@ -1,0 +1,17 @@
+---
+- hosts: {{ K8S_HOST }}
+  user: {{ K8S_USER }}
+  sudo: yes
+  tasks:
+
+  - name: create consul dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ CONSUL_SERVICENAME }}  state=directory  mode=0777
+
+  - name: create consul conf dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ CONSUL_SERVICENAME }}/conf  state=directory  mode=0777
+    
+  - name: create consul data dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ CONSUL_SERVICENAME }}/data  state=directory  mode=0777
+    
+#  - name: copy consul conf file
+#    copy: src={{ PROJECT_HOME_DIR }}/{{ CONSUL_CONFIG_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ CONSUL_SERVICENAME }}/conf

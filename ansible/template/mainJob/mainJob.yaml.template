@@ -1,0 +1,16 @@
+---
+- hosts: {{ HOST }}
+  user: {{ USER }}
+  sudo: yes
+  tasks:
+
+  - name: run kubectl delete and create job
+    shell: {{ KUBECTL_COMMOND }} delete -f {{ PROJECT_HOME_DIR }}/target/kubernetes/{{ item }}/{{ item }}.yaml
+    ignore_errors: yes
+    with_items:
+{{ KUBERNETE_ITEMS }}
+
+  - name: run kubectl create job
+    shell: {{ KUBECTL_COMMOND }} create -f {{ PROJECT_HOME_DIR }}/target/kubernetes/{{ item }}/{{ item }}.yaml
+    with_items:
+{{ KUBERNETE_ITEMS }}

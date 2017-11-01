@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  user: deployer
+  sudo: yes
+  tasks:
+
+  - name: run kubectl delete and create job
+    shell: kubectl delete -f kubernetes/{{ item }}/{{ item }}.yaml && kubectl create -f kubernetes/{{ item }}/{{ item }}.yaml
+    with_items:
+      - consul
+      - mysql
+      - redis
+      - bot-factory-backend-service
+      - houta
+      - simulate-dc
+      - task-engine

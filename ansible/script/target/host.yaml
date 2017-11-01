@@ -1,0 +1,4 @@
+[k8s_host]
+172.16.101.91 ansible_ssh_user=deployer ansible_ssh_pass=Emotibot1 ansible_sudo_pass=Emotibot1
+[localhost]
+localhost ansible_ssh_user=deployer ansible_ssh_pass=Emotibot1 ansible_sudo_pass=Emotibot1

@@ -1,0 +1,17 @@
+---
+- hosts: {{ K8S_HOST }}
+  user: {{ K8S_USER }}
+  sudo: yes
+  tasks:
+
+  - name: create houta dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ HOUTA_SERVICENAME }}  state=directory  mode=0777
+
+  - name: create houta backend_logs dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ HOUTA_SERVICENAME }}/backend_logs  state=directory  mode=0777
+    
+  - name: create houta debug_logs dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ HOUTA_SERVICENAME }}/debug_logs  state=directory  mode=0777
+    
+  - name: create houta Files file
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ HOUTA_SERVICENAME }}/Files  state=directory  mode=0777

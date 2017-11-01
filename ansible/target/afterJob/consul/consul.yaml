@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  user: deployer
+  sudo: yes
+  tasks:
+
+  - name: create mapping_table for consul
+    shell: curl -XPUT 'http://172.16.101.91:31001/v1/kv/dev/te/mapping_table' -d ''
+    
+  - name: create mapping_table_all for consul
+    shell: curl -XPUT 'http://172.16.101.91:31001/v1/kv/dev/te/mapping_table_all' -d ''
+    
+  - name: create scenario for consul
+    shell: curl -XPUT 'http://172.16.101.91:31001/v1/kv/dev/te/scenario' -d ''
+    
+  - name: create scenario_all for consul
+    shell: curl -XPUT 'http://172.16.101.91:31001/v1/kv/dev/te/scenario_all' -d ''

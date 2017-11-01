@@ -1,0 +1,17 @@
+---
+- hosts: k8s_host
+  user: deployer
+  sudo: yes
+  tasks:
+
+  - name: create consul dir
+    file: path=/servicedata/emotibotsoundbox/consul  state=directory  mode=0777
+
+  - name: create consul conf dir
+    file: path=/servicedata/emotibotsoundbox/consul/conf  state=directory  mode=0777
+    
+  - name: create consul data dir
+    file: path=/servicedata/emotibotsoundbox/consul/data  state=directory  mode=0777
+    
+#  - name: copy consul conf file
+#    copy: src=None dest=/servicedata/emotibotsoundbox/consul/conf

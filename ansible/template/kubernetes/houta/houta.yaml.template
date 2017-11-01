@@ -1,0 +1,83 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: houta
+spec:
+  serviceName: "houta"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: houta-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - houta-{{ PROJECT_NAME }}
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: houta
+        image: {{ HOUTA_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ HOUTA_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /home/deployer/debug_logs/logs
+          name: houtadebug
+        - mountPath: /home/deployer/backend_logs
+          name: houtafile
+        - mountPath: /var/www/html/Files
+          name: houtadata
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime 
+       - name: houtadebug
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/houta/debug_logs/logs
+       - name: houtafile
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/houta/backend_logs
+       - name: houtadata
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/houta/Files
+
+      nodeSelector:
+        kubernetes.io/hostname: {{ K8S_HOST_IP }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ HOUTA_SERVICENAME }}
+  labels:
+    app: houta-{{ PROJECT_NAME }}
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ HOUTA_PORT }}
+    targetPort: {{ HOUTA_TARGETPORT }}
+    nodePort: {{ HOUTA_NODEPORT }}
+  selector:
+    app: houta-{{ PROJECT_NAME }}
+

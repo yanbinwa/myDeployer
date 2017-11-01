@@ -1,0 +1,94 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  serviceName: "mysql"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - mysql-{{ PROJECT_NAME }}
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: mysql
+        image: {{ MYSQL_IMAGE }}
+        env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: {{ CONFIG_NAME }}
+                key: MYSQL_ROOT_PASSWORD
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ MYSQL_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /etc/mysql/my.cnf
+          name: mysqlconfig
+        - mountPath: /var/lib/mysql
+          name: mysqldata
+        - mountPath: /usr/local/bin/docker-entrypoint.sh
+          name: sh
+        - mountPath: /var/local/database/emotibot.sql
+          name: sql
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime 
+       - name: mysqlconfig
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/mysql/config/my.cnf
+       - name: mysqldata
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/mysql/data
+       - name: sh
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/mysql/config/docker-entrypoint.sh
+       - name: sql
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/mysql/config/emotibot.sql
+
+      nodeSelector:
+        kubernetes.io/hostname: {{ K8S_HOST_IP }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ MYSQL_SERVICENAME }}
+  labels:
+    app: mysql-{{ PROJECT_NAME }}
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ MYSQL_PORT }}
+    targetPort: {{ MYSQL_TARGETPORT }}
+    nodePort: {{ MYSQL_NODEPORT }}
+  selector:
+    app: mysql-{{ PROJECT_NAME }}
+

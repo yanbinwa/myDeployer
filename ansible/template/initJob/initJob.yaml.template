@@ -1,0 +1,14 @@
+---
+- hosts: {{ HOST }}
+  user: {{ USER }}
+  sudo: yes
+  tasks:
+
+  - name: init k8s step1
+    shell: {{ KUBECTL_COMMOND }} config set-cluster firstcluster --server=http://172.16.101.91:8080 --insecure-skip-tls-verify=true
+
+  - name: init k8s step2
+    shell: {{ KUBECTL_COMMOND }} config set-context firstctx --cluster=firstcluster --namespace={{ PROJECT_NAME }}
+    
+  - name: init k8s step3
+    shell: {{ KUBECTL_COMMOND }} config use-context firstctx

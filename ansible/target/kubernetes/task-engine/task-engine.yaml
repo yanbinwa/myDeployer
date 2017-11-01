@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: task-engine
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: task-engine-emotibotsoundbox
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - task-engine-emotibotsoundbox
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: task-engine
+        image: 172.16.101.70/hrbot/task-engine:34e4f6b
+        envFrom:
+        - configMapRef:
+            name: emotibotsoundbox
+        ports:
+          - containerPort: 14101
+        resources:
+          limits:
+            cpu: 2
+            memory: 4Gi
+
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /usr/src/app/log
+          name: log
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime
+       - name: log
+         hostPath:
+           path: /var/log/task-engine/log
+
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-engine
+  labels:
+    app: task-engine-emotibotsoundbox
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 14101
+    targetPort: 14101
+  selector:
+    app: task-engine-emotibotsoundbox

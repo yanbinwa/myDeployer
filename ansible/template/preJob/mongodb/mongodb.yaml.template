@@ -1,0 +1,8 @@
+---
+- hosts: {{ K8S_HOST }}
+  user: {{ K8S_USER }}
+  sudo: yes
+  tasks:
+
+  - name: create mongodb dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ MONGODB_SERVICENAME }}  state=directory  mode=0777

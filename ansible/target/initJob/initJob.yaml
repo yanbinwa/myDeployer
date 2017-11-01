@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  user: deployer
+  sudo: yes
+  tasks:
+
+  - name: init k8s step1
+    shell: kubectl config set-cluster firstcluster --server=http://172.16.101.91:8080 --insecure-skip-tls-verify=true
+
+  - name: init k8s step2
+    shell: kubectl config set-context firstctx --cluster=firstcluster --namespace=emotibotsoundbox
+    
+  - name: init k8s step3
+    shell: kubectl config use-context firstctx

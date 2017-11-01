@@ -1,0 +1,86 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: multicustomer
+spec:
+  serviceName: "multicustomer"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: multicustomer-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - multicustomer-{{ PROJECT_NAME }}
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: multicustomer
+        image: {{ MULTICUSTOMER_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ MULTICUSTOMER_TARGETPORT_1 }}
+            name: port1
+          - containerPort: {{ MULTICUSTOMER_TARGETPORT_2 }}
+            name: port2
+        resources:
+          limits:
+            cpu: 4
+            memory: 10Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /usr/src/multicustomer/logs
+          name: logs
+        - mountPath: /usr/src/multicustomer/csv
+          name: csv
+        - mountPath: /usr/src/multicustomer/nlp
+          name: nlp
+          
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime
+       - name: logs
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/multicustomer/logs
+       - name: csv
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/houta/Files/settings
+       - name: nlp
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/multicustomer/nlp
+           
+      nodeSelector:
+        kubernetes.io/hostname: {{ K8S_HOST_IP }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ MULTICUSTOMER_SERVICENAME }}
+  labels:
+    app: multicustomer-{{ PROJECT_NAME }}
+spec:
+  ports:
+  - name: port1
+    port: {{ MULTICUSTOMER_PORT_1 }}
+    targetPort: {{ MULTICUSTOMER_TARGETPORT_1 }}
+  - name: port2
+    port: {{ MULTICUSTOMER_PORT_2 }}
+    targetPort: {{ MULTICUSTOMER_TARGETPORT_2 }}
+  selector:
+    app: multicustomer-{{ PROJECT_NAME }}

@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: simulate-dc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: simulate-dc-emotibotsoundbox
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - simulate-dc-emotibotsoundbox
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: simulate-dc
+        image: 172.16.101.70/hrbot/fake-dc:4180625
+        envFrom:
+        - configMapRef:
+            name: emotibotsoundbox
+        ports:
+          - containerPort: 80
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+           
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: 172.16.101.70/hrbot/fake-dc:4180625
+  labels:
+    app: simulate-dc-emotibotsoundbox
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 10901
+    targetPort: 80
+  selector:
+    app: simulate-dc-emotibotsoundbox

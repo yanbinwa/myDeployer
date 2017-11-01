@@ -1,0 +1,17 @@
+---
+- hosts: k8s_host
+  user: deployer
+  sudo: yes
+  tasks:
+
+  - name: create houta dir
+    file: path=/servicedata/emotibotsoundbox/houta  state=directory  mode=0777
+
+  - name: create houta backend_logs dir
+    file: path=/servicedata/emotibotsoundbox/houta/backend_logs  state=directory  mode=0777
+    
+  - name: create houta debug_logs dir
+    file: path=/servicedata/emotibotsoundbox/houta/debug_logs  state=directory  mode=0777
+    
+  - name: create houta Files file
+    file: path=/servicedata/emotibotsoundbox/houta/Files  state=directory  mode=0777

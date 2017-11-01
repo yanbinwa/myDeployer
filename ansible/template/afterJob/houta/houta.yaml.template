@@ -1,0 +1,14 @@
+---
+- hosts: {{ HOST }}
+  user: {{ USER }}
+  sudo: yes
+  tasks:
+
+  - name: replace word_bank_check.php file
+    shell: {{ KUBECTL_COMMOND }} cp {{ PROJECT_HOME_DIR }}/{{ HOUTA_WORD_BANK_CHECK_FILE }} {{ HOUTA_SERVICENAME }}-0:/var/www/html/api/ApiKey/word_bank_check.php
+    
+  - name: replace intent_check.php file
+    shell: {{ KUBECTL_COMMOND }} cp {{ PROJECT_HOME_DIR }}/{{ HOUTA_INTENT_CHECK_FILE }} {{ HOUTA_SERVICENAME }}-0:/var/www/html/api/ApiKey/intent_check.php
+    
+  - name: replace mapping_table_upload.php file
+    shell: {{ KUBECTL_COMMOND }} cp {{ PROJECT_HOME_DIR }}/{{ HOUTA_MAPPING_TABLE_UPLOAD_FILE }} {{ HOUTA_SERVICENAME }}-0:/var/www/html/api/ApiKey/mapping_table_upload.php
