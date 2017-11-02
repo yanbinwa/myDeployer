@@ -60,16 +60,16 @@ spec:
            path: /etc/localtime 
        - name: mysqlconfig
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/mysql/config/my.cnf
+           path: /servicedata/{{ PROJECT_NAME }}/{{ MYSQL_SERVICENAME }}/config/my.cnf
        - name: mysqldata
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/mysql/data
+           path: /servicedata/{{ PROJECT_NAME }}/{{ MYSQL_SERVICENAME }}/data
        - name: sh
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/mysql/config/docker-entrypoint.sh
+           path: /servicedata/{{ PROJECT_NAME }}/{{ MYSQL_SERVICENAME }}/config/docker-entrypoint.sh
        - name: sql
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/mysql/config/emotibot.sql
+           path: /servicedata/{{ PROJECT_NAME }}/{{ MYSQL_SERVICENAME }}/config/emotibot.sql
 
       nodeSelector:
         kubernetes.io/hostname: {{ K8S_HOST_IP }}

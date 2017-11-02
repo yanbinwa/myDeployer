@@ -1,0 +1,1 @@
+  SRL_NLP_WEB_SERVICE: "http://{{ NLU_SERVICENAME }}:{{ NLU_PORT }}/"

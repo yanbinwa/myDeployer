@@ -12,13 +12,10 @@ K8S_PASSWORD: Emotibot1
 
 CONFIG_NAME: emotibotsoundbox
 PROJECT_NAME: emotibotsoundbox
-MAIN_PRIORITIZED_JOB_LIST: consul,mysql,redis,mongodb
-#PRE_JOB_LIST: mysql,houta,multicustomer,mongodb
-#MAIN_JOB_LIST: mysql,bot-factory-backend-service,consul,houta,redis,simulate-dc,task-engine,multicustomer,mongodb
-#AFTER_JOB_LIST: consul,houta
+MAIN_PRIORITIZED_JOB_LIST: consul,mysql,redis,mongodb,houta,solr,arangodb
 PRE_JOB_LIST: 
-MAIN_JOB_LIST: mongodb
-AFTER_JOB_LIST: 
+MAIN_JOB_LIST: 
+AFTER_JOB_LIST: houta
 
 # change for diff env
 KUBECTL_COMMOND: /usr/local/bin/kubectl
@@ -41,57 +38,65 @@ CONSUL_CONFIG_FILE:
 ##mysql
 MYSQL_CONFIG_FILE: package/mysql/my.cnf
 MYSQL_SH_FILE: package/mysql/docker-entrypoint.sh
-MYSQL_SQL_FILE: package/mysql/emotibot.sql
+MYSQL_SQL_FILE: /home/deployer/yanbinwa/package/emotibot.sql
+
+##solr
+SOLR_HEAP_SH_FILE: package/solr/set-heap.sh
+SOLR_JMX_SH_FILE: package/solr/set-jmx.sh
+SOLR_DATA_TAR_FILE: /home/deployer/yanbinwa/package/solr.tar
+
+##arangodb
+ARANGODB_DATA_TAR_FILE: /home/deployer/yanbinwa/package/arangodb3.tar
 
 #main job
 
 ##bot-factory-backend-service
-BOT_FACTORY_BACKEND_SERVICE_IMAGE: 172.16.101.70/hrbot/bot-factory-backend-service:4351bad
+BOT_FACTORY_BACKEND_SERVICE_IMAGE: 172.16.101.70/emotibotsoundbox/bot-factory-backend-service:4351bad
 BOT_FACTORY_BACKEND_SERVICE_SERVICENAME: bot-factory-backend-service
 BOT_FACTORY_BACKEND_SERVICE_TARGETPORT: 15501
 BOT_FACTORY_BACKEND_SERVICE_PORT: 15501
 
 ##consul
-CONSUL_IMAGE: 172.16.101.70/hrbot/consul:0.8.4
+CONSUL_IMAGE: 172.16.101.70/emotibotsoundbox/consul:0.8.4
 CONSUL_SERVICENAME: consul
 CONSUL_TARGETPORT: 8500
 CONSUL_PORT: 8500
 CONSUL_NODEPORT: 31001
 
 ##houta
-HOUTA_IMAGE: 172.16.101.70/hrbot/houta:c9908dd_task-engine
+HOUTA_IMAGE: 172.16.101.70/emotibotsoundbox/houta:c9908dd_task-engine
 HOUTA_SERVICENAME: houta
 HOUTA_TARGETPORT: 80
 HOUTA_PORT: 80
 HOUTA_NODEPORT: 31017
 
 ##mysql
-MYSQL_IMAGE: 172.16.101.70/hrbot/mysql:5.7
+MYSQL_IMAGE: 172.16.101.70/emotibotsoundbox/mysql:5.7
 MYSQL_SERVICENAME: mysql
 MYSQL_TARGETPORT: 3306
 MYSQL_PORT: 3306
 MYSQL_NODEPORT: 31018
 
 ##redis
-REDIS_IMAGE: 172.16.101.70/hrbot/redis:latest
+REDIS_IMAGE: 172.16.101.70/emotibotsoundbox/redis:latest
 REDIS_SERVICENAME: redis
 REDIS_TARGETPORT: 6379
 REDIS_PORT: 6379
 
 ##simulate_dc
-SIMULATE_DC_IMAGE: 172.16.101.70/hrbot/fake-dc:4180625
+SIMULATE_DC_IMAGE: 172.16.101.70/emotibotsoundbox/fake-dc:4180625
 SIMULATE_DC_SERVICENAME: simulate-dc
 SIMULATE_DC_TARGETPORT: 80
 SIMULATE_DC_PORT: 10901
 
 ##task-engine
-TASK_ENGINE_IMAGE: 172.16.101.70/hrbot/task-engine:34e4f6b
+TASK_ENGINE_IMAGE: 172.16.101.70/emotibotsoundbox/task-engine:34e4f6b
 TASK_ENGINE_SERVICENAME: task-engine
 TASK_ENGINE_TARGETPORT: 14101
 TASK_ENGINE_PORT: 14101
 
 ##multicustomer
-MULTICUSTOMER_IMAGE: 172.16.101.70/hrbot/multicustomer:febb902
+MULTICUSTOMER_IMAGE: 172.16.101.70/emotibotsoundbox/multicustomer:febb902
 MULTICUSTOMER_SERVICENAME: multicustomer
 MULTICUSTOMER_TARGETPORT_1: 9011
 MULTICUSTOMER_PORT_1: 14501
@@ -99,27 +104,98 @@ MULTICUSTOMER_TARGETPORT_2: 873
 MULTICUSTOMER_PORT_2: 14502
 
 ##mongodb
-MONGODB_IMAGE: 172.16.101.70/hrbot/mongo:3.2.8
+MONGODB_IMAGE: 172.16.101.70/emotibotsoundbox/mongo:3.2.8
 MONGODB_SERVICENAME: mongodb
 MONGODB_TARGETPORT: 27017
 MONGODB_PORT: 27017
 
 ##nlu
-NLU_IMAGE: 172.16.101.70/hrbot/changhong-nlu:2017092600
+NLU_IMAGE: 172.16.101.70/emotibotsoundbox/changhong-nlu:2017092600
 NLU_SERVICENAME: nlu
 NLU_TARGETPORT: 13901
 NLU_PORT: 13901
 
 ##solr-etl-agent
-SOLR_ETL_AGENT_IMAGE: 172.16.101.70/hrbot/task-engine:34e4f6b
-SOLR_ETL_AGENT_SERVICENAME: task-engine
-SOLR_ETL_AGENT_TARGETPORT: 14101
-SOLR_ETL_AGENT_PORT: 14101
+SOLR_ETL_AGENT_IMAGE: 172.16.101.70/emotibotsoundbox/solr-etl-agent:2e91d14
+SOLR_ETL_AGENT_SERVICENAME: solr-etl-agent
+SOLR_ETL_AGENT_TARGETPORT: 1337
+SOLR_ETL_AGENT_PORT: 14401
+
+##answer-classifier
+ANSWER_CLASSIFIER_IMAGE: 172.16.101.70/emotibotsoundbox/answer_classifier:0ac8971
+ANSWER_CLASSIFIER_SERVICENAME: answer-classifier
+ANSWER_CLASSIFIER_TARGETPORT: 9001
+ANSWER_CLASSIFIER_PORT: 10601
+
+##emotion-support-chat
+EMOTION_SUPPORT_CHAT_IMAGE: 172.16.101.70/emotibotsoundbox/emotion-support:544f8eb
+EMOTION_SUPPORT_CHAT_SERVICENAME: emotion-support-chat
+EMOTION_SUPPORT_CHAT_TARGETPORT: 80
+EMOTION_SUPPORT_CHAT_PORT: 12799
+
+##chat-service
+CHAT_SERVICE_IMAGE: 172.16.101.70/emotibotsoundbox/chat_service:527edd5
+CHAT_SERVICE_SERVICENAME: chat-service
+CHAT_SERVICE_TARGETPORT: 8080
+CHAT_SERVICE_PORT: 10930
+
+##wordtovecservice
+WORDTOVECSERVICE_IMAGE: 172.16.101.70/emotibotsoundbox/rc_word2vec:86087a3
+WORDTOVECSERVICE_SERVICENAME: wordtovecservice
+WORDTOVECSERVICE_TARGETPORT: 11501
+WORDTOVECSERVICE_PORT: 11501
+
+##solr
+SOLR_IMAGE: 172.16.101.70/hrbot/solr:5.5
+SOLR_SERVICENAME: solr
+SOLR_TARGETPORT_1: 8983
+SOLR_PORT_1: 8081
+SOLR_TARGETPORT_2: 8082
+SOLR_PORT_2: 8082
+
+##intent-support
+INTENT_IMAGE: 172.16.101.70/emotibotsoundbox/intent-support:5d21258
+INTENT_SERVICENAME: intent-support
+INTENT_TARGETPORT: 80
+INTENT_PORT: 14399
+
+##arangodb
+ARANGODB_IMAGE: 172.16.101.70/emotibotsoundbox/arangodb:3.1.8
+ARANGODB_SERVICENAME: arangodb
+ARANGODB_TARGETPORT: 8529
+ARANGODB_PORT: 11003
+ARANGODB_NODEPORT: 31010
+
+##knowledgegraph
+KNOWLEDGEGRAPH_IMAGE: 172.16.101.70/emotibotsoundbox/knowlegegraph:e23a299
+KNOWLEDGEGRAPH_SERVICENAME: knowledgegraph
+KNOWLEDGEGRAPH_TARGETPORT_1: 11000
+KNOWLEDGEGRAPH_PORT_1: 11000
+KNOWLEDGEGRAPH_TARGETPORT_2: 11002
+KNOWLEDGEGRAPH_PORT_2: 11002
+
+##semantic-role-labeler
+SEMANTIC_ROLE_LABELER_IMAGE: 172.16.101.70/emotibotsoundbox/semantic_role_labeler:95b03fc
+SEMANTIC_ROLE_LABELER_SERVICENAME: semantic-role-labeler
+SEMANTIC_ROLE_LABELER_TARGETPORT: 9000
+SEMANTIC_ROLE_LABELER_PORT: 12401
+
+##common-parser-service
+COMMON_PARSER_SERVICE_IMAGE: 172.16.101.70/emotibotsoundbox/common-parser-service:14bff52
+COMMON_PARSER_SERVICE_SERVICENAME: common-parser-service
+COMMON_PARSER_SERVICE_TARGETPORT: 9902
+COMMON_PARSER_SERVICE_PORT: 14901
+
+##intent-engine
+INTENT_ENGINE_IMAGE: 172.16.101.70/emotibotsoundbox/intent_engine:1f83be9
+INTENT_ENGINE_SERVICENAME: intent-engine
+INTENT_ENGINE_TARGETPORT: 80
+INTENT_ENGINE_PORT: 15001
 
 #afterJob
 
 ##houta
-
 HOUTA_WORD_BANK_CHECK_FILE: package/houta/word_bank_check.php
 HOUTA_INTENT_CHECK_FILE: package/houta/intent_check.php
 HOUTA_MAPPING_TABLE_UPLOAD_FILE: package/houta/mapping_table_upload.php
+HOUTA_KNOWLEDGE_CHECK_FILE: package/houta/knowledge_check.php

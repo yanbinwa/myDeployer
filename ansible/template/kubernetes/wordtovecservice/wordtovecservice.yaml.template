@@ -1,0 +1,71 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wordtovecservice
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wordtovecservice-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - wordtovecservice-{{ PROJECT_NAME }}
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: wordtovecservice
+        image: {{ WORDTOVECSERVICE_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ WORDTOVECSERVICE_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime
+
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ WORDTOVECSERVICE_SERVICENAME }}
+  labels:
+    app: wordtovecservice-{{ PROJECT_NAME }}
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ WORDTOVECSERVICE_PORT }}
+    targetPort: {{ WORDTOVECSERVICE_TARGETPORT }}
+  selector:
+    app: wordtovecservice-{{ PROJECT_NAME }}

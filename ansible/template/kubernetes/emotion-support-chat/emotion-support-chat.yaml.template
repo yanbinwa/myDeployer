@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: emotion-support-chat
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: emotion-support-chat-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - emotion-support-chat-{{ PROJECT_NAME }}
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: emotion-support-chat
+        image: {{ EMOTION_SUPPORT_CHAT_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ EMOTION_SUPPORT_CHAT_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+           
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emotion-support-chat
+  labels:
+    app: emotion-support-chat-{{ PROJECT_NAME }}
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ EMOTION_SUPPORT_CHAT_PORT }}
+    targetPort: {{ EMOTION_SUPPORT_CHAT_TARGETPORT }}
+  selector:
+    app: emotion-support-chat-{{ PROJECT_NAME }}

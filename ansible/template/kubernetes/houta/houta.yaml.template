@@ -52,13 +52,13 @@ spec:
            path: /etc/localtime 
        - name: houtadebug
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/houta/debug_logs/logs
+           path: /servicedata/{{ PROJECT_NAME }}/{{ HOUTA_SERVICENAME }}/debug_logs/logs
        - name: houtafile
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/houta/backend_logs
+           path: /servicedata/{{ PROJECT_NAME }}/{{ HOUTA_SERVICENAME }}/backend_logs
        - name: houtadata
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/houta/Files
+           path: /servicedata/{{ PROJECT_NAME }}/{{ HOUTA_SERVICENAME }}/Files
 
       nodeSelector:
         kubernetes.io/hostname: {{ K8S_HOST_IP }}

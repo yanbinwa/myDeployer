@@ -1,0 +1,26 @@
+---
+- hosts: {{ K8S_HOST }}
+  user: {{ K8S_USER }}
+  sudo: yes
+  tasks:
+
+  - name: create solr service dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ SOLR_SERVICENAME }}  state=directory  mode=0777
+
+  - name: create solr root dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ SOLR_SERVICENAME }}/solr  state=directory  mode=0777
+    
+  - name: create solr conf dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ SOLR_SERVICENAME }}/solr/conf  state=directory  mode=0777
+   
+  - name: copy solr heap file
+    copy: src={{ PROJECT_HOME_DIR }}/{{ SOLR_HEAP_SH_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ SOLR_SERVICENAME }}/solr/conf  mode=755
+    
+  - name: copy solr jmx file
+    copy: src={{ PROJECT_HOME_DIR }}/{{ SOLR_JMX_SH_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ SOLR_SERVICENAME }}/solr/conf  mode=755
+    
+  - name: install solr data tar file
+    unarchive: src={{ SOLR_DATA_TAR_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ SOLR_SERVICENAME }}/solr mode=755
+    
+  - name: change file user and group
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ SOLR_SERVICENAME }} owner=8983  group=8983

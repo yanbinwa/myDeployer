@@ -56,13 +56,13 @@ spec:
            path: /etc/localtime
        - name: logs
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/multicustomer/logs
+           path: /servicedata/{{ PROJECT_NAME }}/{{ MULTICUSTOMER_SERVICENAME }}/logs
        - name: csv
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/houta/Files/settings
+           path: /servicedata/{{ PROJECT_NAME }}/{{ MULTICUSTOMER_SERVICENAME }}/Files/settings
        - name: nlp
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/multicustomer/nlp
+           path: /servicedata/{{ PROJECT_NAME }}/{{ MULTICUSTOMER_SERVICENAME }}/nlp
            
       nodeSelector:
         kubernetes.io/hostname: {{ K8S_HOST_IP }}

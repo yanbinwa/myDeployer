@@ -1,0 +1,68 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: arangodb
+spec:
+  serviceName: "arangodb"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: arangodb-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - arangodb-{{ PROJECT_NAME }}
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: arangodb
+        image: {{ ARANGODB_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ ARANGODB_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 2
+            memory: 10Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+
+        volumeMounts:
+        - mountPath: /var/lib/arangodb3
+          name: arangodbdata
+      volumes:
+       - name: arangodbdata
+         hostPath:
+           path: /servicedata/{{ PROJECT_NAME }}/{{ ARANGODB_SERVICENAME }}/data/arangodb3
+           
+      nodeSelector:
+        kubernetes.io/hostname: {{ K8S_HOST_IP }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ ARANGODB_SERVICENAME }}
+  labels:
+    app: arangodb-{{ PROJECT_NAME }}
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ ARANGODB_PORT }}
+    targetPort: {{ ARANGODB_TARGETPORT }}
+    nodePort: {{ ARANGODB_NODEPORT }}
+  selector:
+    app: arangodb-{{ PROJECT_NAME }}

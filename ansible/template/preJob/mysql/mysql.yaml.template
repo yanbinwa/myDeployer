@@ -20,4 +20,4 @@
     copy: src={{ PROJECT_HOME_DIR }}/{{ MYSQL_SH_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ MYSQL_SERVICENAME }}/config  mode=755
     
   - name: copy mysql sql file
-    copy: src={{ PROJECT_HOME_DIR }}/{{ MYSQL_SQL_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ MYSQL_SERVICENAME }}/config
+    copy: src={{ MYSQL_SQL_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ MYSQL_SERVICENAME }}/config

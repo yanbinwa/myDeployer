@@ -50,10 +50,10 @@ spec:
            path: /etc/localtime 
        - name: consulconfig
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/consul/config
+           path: /servicedata/{{ PROJECT_NAME }}/{{ CONSUL_SERVICENAME }}/config
        - name: consuldata
          hostPath:
-           path: /servicedata/{{ PROJECT_NAME }}/consul/data
+           path: /servicedata/{{ PROJECT_NAME }}/{{ CONSUL_SERVICENAME }}/data
 
       nodeSelector:
         kubernetes.io/hostname: {{ K8S_HOST_IP }}

@@ -1,0 +1,76 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: semantic-role-labeler
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: semantic-role-labeler-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - semantic-role-labeler-{{ PROJECT_NAME }}
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: semantic-role-labeler
+        image: {{ SEMANTIC_ROLE_LABELER_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ SEMANTIC_ROLE_LABELER_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /var/log/web
+          name: loggerfile
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime 
+       - name: loggerfile
+         hostPath:
+           path: /var/log/{{ PROJECT_NAME }}/{{ SEMANTIC_ROLE_LABELER_SERVICENAME }}/log
+
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ SEMANTIC_ROLE_LABELER_SERVICENAME }}
+  labels:
+    app: semantic-role-labeler-{{ PROJECT_NAME }}
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ SEMANTIC_ROLE_LABELER_PORT }}
+    targetPort: {{ SEMANTIC_ROLE_LABELER_TARGETPORT }}
+  selector:
+    app: semantic-role-labeler-{{ PROJECT_NAME }}

@@ -1,0 +1,76 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: chat-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: chat-service-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - chat-service-{{ PROJECT_NAME }}
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: chat-service
+        image: {{ CHAT_SERVICE_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ CHAT_SERVICE_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 2
+            memory: 5Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+        - mountPath: /var/logs
+          name: log
+         
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime
+       - name: log
+         hostPath:
+           path: /var/log/{{ PROJECT_NAME }}/{{ CHAT_SERVICE_SERVICENAME }}/log
+           
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ CHAT_SERVICE_SERVICENAME }}
+  labels:
+    app: chat-service-{{ PROJECT_NAME }}
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ CHAT_SERVICE_PORT }}
+    targetPort: {{ CHAT_SERVICE_TARGETPORT }}
+  selector:
+    app: chat-service-{{ PROJECT_NAME }}

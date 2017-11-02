@@ -49,7 +49,7 @@ spec:
            path: /etc/localtime
        - name: log
          hostPath:
-           path: /var/log/{{ PROJECT_NAME }}/task-engine/log
+           path: /var/log/{{ PROJECT_NAME }}/{{ TASK_ENGINE_SERVICENAME }}/log
 
   minReadySeconds: 5
   strategy:

@@ -1,0 +1,70 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: common-parser-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: common-parser-service-{{ PROJECT_NAME }}
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: 
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - common-parser-service-{{ PROJECT_NAME }}
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: common-parser-service
+        image: {{ COMMON_PARSER_SERVICE_IMAGE }}
+        envFrom:
+        - configMapRef:
+            name: {{ CONFIG_NAME }}
+        ports:
+          - containerPort: {{ COMMON_PARSER_SERVICE_TARGETPORT }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 5Gi
+          requests:
+            cpu: 0.1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: hosttime
+      volumes:
+       - name: hosttime
+         hostPath:
+           path: /etc/localtime
+           
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ COMMON_PARSER_SERVICE_SERVICENAME }}
+  labels:
+    app: common-parser-service-{{ PROJECT_NAME }}
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ COMMON_PARSER_SERVICE_PORT }}
+    targetPort: {{ COMMON_PARSER_SERVICE_TARGETPORT }}
+  selector:
+    app: common-parser-service-{{ PROJECT_NAME }}

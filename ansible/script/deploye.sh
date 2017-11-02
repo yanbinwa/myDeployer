@@ -1,6 +1,6 @@
 #!/usr/bin/expect 
 
-set timeout 300
+set timeout 1200
 
 # change for diff env
 set MAC_PROJECT_HOME "/Users/emotibot/Documents/workspace/other/myDeployer/ansible"

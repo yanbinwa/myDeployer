@@ -1,0 +1,14 @@
+---
+- hosts: {{ K8S_HOST }}
+  user: {{ K8S_USER }}
+  sudo: yes
+  tasks:
+
+  - name: create arangodb service dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ ARANGODB_SERVICENAME }}  state=directory  mode=0777
+
+  - name: create arangodb data dir
+    file: path=/servicedata/{{ PROJECT_NAME }}/{{ ARANGODB_SERVICENAME }}/data  state=directory  mode=0777
+    
+  - name: install arangodb data tar file
+    unarchive: src={{ ARANGODB_DATA_TAR_FILE }} dest=/servicedata/{{ PROJECT_NAME }}/{{ ARANGODB_SERVICENAME }}/data mode=755

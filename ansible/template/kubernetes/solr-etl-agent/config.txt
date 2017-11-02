@@ -1,0 +1,6 @@
+  SEA_CONFIG_SERVER_HOST: "{{ CONSUL_SERVICENAME }}"
+  SEA_CONFIG_SERVER_PORT: "{{ CONSUL_PORT }}"
+  SEA_BASE_CORE: "merge_6_25"
+  SEA_CUSTOMER_CORE: "3rd_core"
+  SEA_PORT: "14401"
+  SEA_VOLUME_PATH: "/home/deployer/debug_logs/solr-etl-agent"
