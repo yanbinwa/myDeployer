@@ -12,3 +12,6 @@
     
   - name: replace mapping_table_upload.php file
     shell: {{ KUBECTL_COMMOND }} cp {{ PROJECT_HOME_DIR }}/{{ HOUTA_MAPPING_TABLE_UPLOAD_FILE }} {{ HOUTA_SERVICENAME }}-0:/var/www/html/api/ApiKey/mapping_table_upload.php
+    
+  - name: replace knowledge_check.php file
+    shell: {{ KUBECTL_COMMOND }} cp {{ PROJECT_HOME_DIR }}/{{ HOUTA_KNOWLEDGE_CHECK_FILE }} {{ HOUTA_SERVICENAME }}-0:/var/www/html/api/ApiKey/knowledge_check.php
