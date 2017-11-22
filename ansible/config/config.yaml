@@ -14,7 +14,7 @@ CONFIG_NAME: emotibotsoundbox
 PROJECT_NAME: emotibotsoundbox
 MAIN_PRIORITIZED_JOB_LIST: consul,mysql,redis,mongodb,houta,solr,arangodb
 PRE_JOB_LIST: 
-MAIN_JOB_LIST: 
+MAIN_JOB_LIST: bot-factory-backend-service,wordtovecservice,task-engine,multicustomer,houta
 AFTER_JOB_LIST: houta
 
 # change for diff env
@@ -72,7 +72,7 @@ HOUTA_NODEPORT: 31017
 
 ##mysql
 MYSQL_IMAGE: 172.16.101.70/emotibotsoundbox/mysql:5.7
-MYSQL_SERVICENAME: mysql
+MYSQL_SERVICENAME: mariadbcluster.common
 MYSQL_TARGETPORT: 3306
 MYSQL_PORT: 3306
 MYSQL_NODEPORT: 31018

@@ -4,7 +4,7 @@
   sudo: yes
   tasks:
 
-  - name: run kubectl delete and create job
+  - name: run kubectl delete job
     shell: {{ KUBECTL_COMMOND }} delete -f {{ PROJECT_HOME_DIR }}/target/kubernetes/{{ item }}/{{ item }}.yaml
     ignore_errors: yes
     with_items:
